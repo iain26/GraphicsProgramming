@@ -76,34 +76,20 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\res\shader.frag">
+    <None Include="..\res\Shaders\shaderRimToon.frag">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\res\shader.vert">
+    <None Include="..\res\Shaders\DissolveShader.vert">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\res\fog.vert">
+    <None Include="..\res\Shaders\DissolveShader.frag">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\res\fog.frag">
+    <None Include="..\res\Shaders\shader.vert">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\res\shaderRimToon.frag">
+    <None Include="..\res\Shaders\shaderRimToon.vert">
       <Filter>Resource Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="..\res\Plane.obj">
-      <Filter>Resource Files</Filter>
-    </Object>
-    <Object Include="..\res\bird.obj">
-      <Filter>Resource Files</Filter>
-    </Object>
-    <Object Include="..\res\NewPlane.obj">
-      <Filter>Resource Files</Filter>
-    </Object>
-    <Object Include="..\res\SkyCubeTest.obj">
-      <Filter>Resource Files</Filter>
-    </Object>
   </ItemGroup>
 </Project>

@@ -51,6 +51,7 @@ void TheGame::Initialise()
 
 	NewShader.InitialiseShader("..\\res\\Shaders\\shaderRimToon");
 	OldShader.InitialiseShader("..\\res\\Shaders\\shader");
+	DissShader.InitialiseShader("..\\res\\Shaders\\DissolveShader");
 
 	skyTexture.LoadTextureFile("..\\res\\Textures\\Sky.jpg");
 	planeTexture.LoadTextureFile("..\\res\\Textures\\Metal.jpg");
@@ -341,6 +342,11 @@ void TheGame::SetRimToonLighting() {
 	NewShader.setMat4("u_pm", cam.GetProjection());
 }
 
+void TheGame::SetDissolveShader() {
+	DissShader.setMat4("matrix_viewProjection", cam.GetViewProjection());
+	DissShader.set
+}
+
 void TheGame::ObjectMGR() {
 	OldShader.Bind();
 	// sets active texture
@@ -350,7 +356,7 @@ void TheGame::ObjectMGR() {
 	// draw sphere 
 	skySphere.RenderModel();
 
-	//SetShader(OldShader);sss
+	//SetShader(OldShader);
 
 	// sets position, rotation and scale for plane
 	planeMovements.SetPos(glm::vec3(PlaneRotZ *-5, planeRotX *-5, 10));

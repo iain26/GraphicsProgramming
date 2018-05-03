@@ -89,6 +89,7 @@ private:
 
 	Shader NewShader;
 	Shader OldShader;
+	Shader DissShader;
 	Shader birdShader;
 
 	Tex skyTexture;
@@ -97,5 +98,6 @@ private:
 
 	void SetToonLighting();
 	void SetRimToonLighting();
+	void SetDissolveShader();
 };
 

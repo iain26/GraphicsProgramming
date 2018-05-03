@@ -28,7 +28,7 @@ void main() {
 	else if (intensity > 0.25)
 		color = vec4(0.2,0.2,0.2,1.0);
 	else
-		color = vec4(0.1,0.,0.1,1.0);
+		color = vec4(0.1,0.1,0.1,1.0);
 
   fragcolor.a = 0.6;
   fragcolor.rgb = vec3(smoothstep(0.4, 0.9, vdn)) + vec3(color.x,color.y,color.z);

@@ -96,25 +96,11 @@
     <ClInclude Include="transform.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\res\fog.frag" />
-    <None Include="..\res\fog.vert" />
-    <None Include="..\res\shader.frag" />
-    <None Include="..\res\shader.vert" />
-    <None Include="..\res\shaderRimToon.frag" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="..\res\bird.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </Object>
-    <Object Include="..\res\SkyCubeTest.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </Object>
-    <Object Include="..\res\NewPlane.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </Object>
-    <Object Include="..\res\Plane.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </Object>
+    <None Include="..\res\Shaders\DissolveShader.frag" />
+    <None Include="..\res\Shaders\DissolveShader.vert" />
+    <None Include="..\res\Shaders\shader.vert" />
+    <None Include="..\res\Shaders\shaderRimToon.frag" />
+    <None Include="..\res\Shaders\shaderRimToon.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

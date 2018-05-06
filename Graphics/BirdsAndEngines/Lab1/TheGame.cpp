@@ -344,7 +344,8 @@ void TheGame::SetRimToonLighting() {
 
 void TheGame::SetDissolveShader() {
 	DissShader.setMat4("matrix_viewProjection", cam.GetViewProjection());
-	DissShader.set
+	DissShader.setMat4("matrix_model", glm::mat4(1.0f));
+	
 }
 
 void TheGame::ObjectMGR() {

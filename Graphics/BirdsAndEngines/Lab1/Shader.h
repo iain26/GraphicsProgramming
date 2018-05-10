@@ -12,6 +12,7 @@ class Shader
 public:
 	Shader();
 	void InitialiseShader(const std::string& file);
+	void LoadThreeShaders(const std::string& file);
 	void Bind();
 	GLuint ReturnProgram() {
 		return ShaderProgram;
@@ -157,7 +158,7 @@ public:
 
 protected:
 private:
-	static const unsigned int NumShade = 2; 
+	static const unsigned int NumShade = 3; 
 
 	enum
 	{

@@ -103,5 +103,17 @@
     <None Include="..\res\Shaders\reflection.vert">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\res\Shaders\VisNormShader.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Shaders\VisNormShader.geo">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Shaders\VisNormShader.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Shaders\shaderRimToon.geo">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

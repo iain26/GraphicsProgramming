@@ -1,6 +1,6 @@
 #version 400
 
-varying vec2 vUv0;
+out vec2 vUv0;
 
 uniform sampler2D uDiffuseMap;
 uniform sampler2D uHeightMap;

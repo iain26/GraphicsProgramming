@@ -33,6 +33,31 @@ void Shader::InitialiseShader(const std::string& filename)
 	uniforms[TransformUnif] = glGetUniformLocation(ShaderProgram, "transform");
 }
 
+void Shader::LoadThreeShaders(const std::string& filename) {
+	ShaderProgram = glCreateProgram();
+	shaders[0] = ShaderCreation(ShaderLoad(filename + ".vert"), GL_VERTEX_SHADER);
+	shaders[1] = ShaderCreation(ShaderLoad(filename + ".frag"), GL_FRAGMENT_SHADER);
+	shaders[2] = ShaderCreation(ShaderLoad(filename + ".geo"), GL_GEOMETRY_SHADER);
+
+	// add shaders to program
+	for (unsigned int i = 0; i < NumShade; i++)
+	{
+		glAttachShader(ShaderProgram, shaders[i]);
+	}
+	// link positons, normals and texture coordinates assigned to shader program
+	glBindAttribLocation(ShaderProgram, 0, "position");
+	glBindAttribLocation(ShaderProgram, 1, "normal");
+	glBindAttribLocation(ShaderProgram, 2, "texCoord");
+	// create executable and return if the link to shader program was successful
+	glLinkProgram(ShaderProgram);
+	ShaderErrorHandling(ShaderProgram, GL_LINK_STATUS, true, "Error: Shader program linking failed");
+	// validates whether executables are contained in shader program
+	glValidateProgram(ShaderProgram);
+	ShaderErrorHandling(ShaderProgram, GL_VALIDATE_STATUS, true, "Error: Shader program not valid");
+	// get transform uniform from shader program
+	uniforms[TransformUnif] = glGetUniformLocation(ShaderProgram, "transform");
+}
+
 Shader::~Shader()
 {
 	for (unsigned int i = 0; i < NumShade; i++)

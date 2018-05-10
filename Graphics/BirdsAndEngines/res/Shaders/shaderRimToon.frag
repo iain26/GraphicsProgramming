@@ -3,7 +3,7 @@
 uniform mat4 u_pm;
 uniform mat4 u_vm;
 uniform vec3 lightDir;
-
+uniform vec3 InputColor;
  
 layout( location = 0 ) out vec4 fragcolor;
  
@@ -31,5 +31,5 @@ void main() {
 		color = vec4(0.1,0.1,0.1,1.0);
 
   fragcolor.a = 0.6;
-  fragcolor.rgb = vec3(smoothstep(0.4, 0.9, vdn)) + vec3(color.x,color.y,color.z);
+  fragcolor.rgb = vec3(smoothstep(0.4, 1.3, vdn)) + vec3(color.x,color.y,color.z);
 }

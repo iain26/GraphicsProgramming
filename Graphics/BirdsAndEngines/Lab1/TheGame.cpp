@@ -50,10 +50,11 @@ void TheGame::Initialise()
 	// starting positons for game
 	SetInitialPositions();
 
-	PlaneShader.InitialiseShader("..\\res\\Shaders\\shaderRimToon");
+	PlaneShader.LoadThreeShaders("..\\res\\Shaders\\shaderRimToon");
 	OldShader.InitialiseShader("..\\res\\Shaders\\shader");
 	//DissShader.InitialiseShader("..\\res\\Shaders\\DissolveShader");
 	Skybox.InitialiseShader("..\\res\\Shaders\\Cubemap");
+	VisNormShader.LoadThreeShaders("..\\res\\Shaders\\VisNormShader");
 
 	skyTexture.LoadTextureFile("..\\res\\Textures\\Sky.jpg");
 	planeTexture.LoadTextureFile("..\\res\\Textures\\Metal.jpg");
@@ -113,7 +114,10 @@ void TheGame::GameLoop()
 		{
 			// takes in keyboard 
 			Keyboard();
-			Render();
+			VisNormShader.Bind();
+			//Render(false);
+			Render(true);
+
 
 			// checks if collision occurred with large sphere around plane
 			if (Collided(*planeMovements.GetPos(), plane.getBoundingSphereRadius(), bird1.getBoundingSpherePos(), bird1.getBoundingSphereRadius())) {
@@ -365,11 +369,33 @@ void TheGame::SetToonLighting() {
 
 void TheGame::SetRimToonLighting() {
 	//PlaneShader.InitialiseShader("..\\res\\Shaders\\shaderRimToon");
+	float explosionFactor;
+	switch (HitsTaken) {
+	case 0:
+		explosionFactor = -1.6;
+		break;
+	case 1:
+		explosionFactor = -1.45;
+		break;
+	case 2:
+		explosionFactor = -1.30;
+		break;
+	case 3:
+		explosionFactor = -1.15;
+		break;
+	case 4:
+		explosionFactor = -1.0;
+		break;
+	case 5:
+		explosionFactor = -0.85;
+		break;
+	}
 	PlaneShader.Bind();
-	PlaneShader.setVec3("lightDir", glm::vec3(-0.5, -0.5, -0.5));
-	PlaneShader.setVec3("InputColor", glm::vec3(1.0, 0.5, 0.5));
+	PlaneShader.setVec3("lightDir", glm::vec3(1.5, 2.5, 3.5));
+	PlaneShader.setVec3("InputColor", glm::vec3(0.5, 0.5, 0.5));
 	PlaneShader.setMat4("u_vm", cam.GetView());
 	PlaneShader.setMat4("u_pm", cam.GetProjection());
+	PlaneShader.setFloat("time", explosionFactor);
 }
 
 //void TheGame::SetDissolveShader() {
@@ -377,6 +403,13 @@ void TheGame::SetRimToonLighting() {
 //	DissShader.setMat4("matrix_model", glm::mat4(1.0f));
 //	DissShader.SetTexture()
 //}
+
+void TheGame::SetVisNormShader() {
+	VisNormShader.Bind();
+	VisNormShader.setMat4("m", planeMovements.GetModel());
+	VisNormShader.setMat4("v", cam.GetView());
+	VisNormShader.setMat4("p", cam.GetProjection());
+}
 
 unsigned int TheGame::SetSkyboxTex() {
 
@@ -454,21 +487,23 @@ void TheGame::SetSkybox() {
 	glDepthMask(GL_TRUE);
 }
 
-void TheGame::ObjectMGR() {
+void TheGame::ObjectMGR(bool loadShaders) {
 
 	//    skybox method
-	SetSkybox();
+	if (loadShaders) {
+		SetSkybox();
 
 
-	OldShader.Bind();
-	// sets active texture
-	skyTexture.Bind(0);
-	// updates the view projection
-	OldShader.UpdateShader(glm::vec3(0, 0, 0), cam);
-	// draw sphere 
-	//skySphere.RenderModel();
+		OldShader.Bind();
+		// sets active texture
+		skyTexture.Bind(0);
+		// updates the view projection
+		OldShader.UpdateShader(glm::vec3(0, 0, 0), cam);
+		// draw sphere 
+		//skySphere.RenderModel();
 
-	//SetShader(OldShader);
+		//SetShader(OldShader);
+	}
 	
 
 
@@ -478,10 +513,16 @@ void TheGame::ObjectMGR() {
 	planeMovements.SetRot(glm::vec3(planeRotX, 0, PlaneRotZ));
 	planeMovements.SetScale(glm::vec3(0.15, 0.15, 0.15));
 
-	SetReflection();
-	//SetRimToonLighting();
+	//SetVisNormShader();
+	//plane.RenderModel();
+	//SetVisNormShader();
+	//plane.RenderModel();
+	//SetReflection();
+	if (loadShaders) {
+		SetRimToonLighting();
 
-	PlaneShader.UpdateShader(planeMovements, cam);
+		PlaneShader.UpdateShader(planeMovements, cam);
+	}
 	planeTexture.Bind(0);
 	plane.RenderModel();
 	// the sphere used for collision is set
@@ -496,9 +537,10 @@ void TheGame::ObjectMGR() {
 		planePos.z + engineOffsetz + (planeRotX * 0.05));
 
 	//     bird methods
-
-	OldShader.Bind();
-	OldShader.UpdateShader(glm::vec3(0, 0, 0), cam);
+	if (loadShaders) {
+		OldShader.Bind();
+		OldShader.UpdateShader(glm::vec3(0, 0, 0), cam);
+	}
 
 	{
 		// gets the direction to travel
@@ -542,13 +584,13 @@ void TheGame::ObjectMGR() {
 	}
 }
 
-void TheGame::Render()
+void TheGame::Render(bool loadShaders)
 {
 	// sets display background to grey
 	displayWindow.ClearDisplay(1.0f, 0.5f, 0.5f, 1.0f);
 	// links shader to memory
 
-	ObjectMGR();
+	ObjectMGR(loadShaders);
 
 	glEnableClientState(GL_COLOR_ARRAY); 
 	glEnd();

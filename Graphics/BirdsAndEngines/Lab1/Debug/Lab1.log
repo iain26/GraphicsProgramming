@@ -1,9 +1,15 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(387,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (Lab1.vcxproj).  This can lead to incorrect clean and rebuild behavior.
   TheGame.cpp
-d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.h(80): warning C4305: 'initializing': truncation from 'double' to 'float'
-d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(15): warning C4930: 'Sound audio(void)': prototyped function not called (was a variable definition intended?)
-d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(111): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(189): warning C4305: 'argument': truncation from 'double' to 'float'
-d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(228): warning C4305: 'argument': truncation from 'double' to 'float'
-d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(260): warning C4305: 'argument': truncation from 'double' to 'float'
-  Lab1.vcxproj -> D:\Uni\GP2\GraphicsProgramming\Graphics\BirdsAndEngines\Debug\BirdsAndEngines.exe
+c:\users\icotte200\documents\github\graphicsprogramming\graphics\birdsandengines\lab1\thegame.h(79): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\icotte200\documents\github\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(15): warning C4930: 'Sound audio(void)': prototyped function not called (was a variable definition intended?)
+c:\users\icotte200\documents\github\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(112): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\icotte200\documents\github\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(193): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\icotte200\documents\github\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(232): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\icotte200\documents\github\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(264): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\icotte200\documents\github\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(375): warning C4305: '=': truncation from 'double' to 'float'
+c:\users\icotte200\documents\github\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(378): warning C4305: '=': truncation from 'double' to 'float'
+c:\users\icotte200\documents\github\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(381): warning C4305: '=': truncation from 'double' to 'float'
+c:\users\icotte200\documents\github\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(384): warning C4305: '=': truncation from 'double' to 'float'
+c:\users\icotte200\documents\github\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(390): warning C4305: '=': truncation from 'double' to 'float'
+  Lab1.vcxproj -> C:\Users\icotte200\Documents\GitHub\GraphicsProgramming\Graphics\BirdsAndEngines\Debug\BirdsAndEngines.exe
+  Lab1.vcxproj -> C:\Users\icotte200\Documents\GitHub\GraphicsProgramming\Graphics\BirdsAndEngines\Debug\BirdsAndEngines.pdb (Partial PDB)

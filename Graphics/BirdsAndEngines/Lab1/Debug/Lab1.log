@@ -3,7 +3,7 @@
 d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.h(80): warning C4305: 'initializing': truncation from 'double' to 'float'
 d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(15): warning C4930: 'Sound audio(void)': prototyped function not called (was a variable definition intended?)
 d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(111): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(187): warning C4305: 'argument': truncation from 'double' to 'float'
-d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(226): warning C4305: 'argument': truncation from 'double' to 'float'
-d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(258): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(189): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(228): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\uni\gp2\graphicsprogramming\graphics\birdsandengines\lab1\thegame.cpp(260): warning C4305: 'argument': truncation from 'double' to 'float'
   Lab1.vcxproj -> D:\Uni\GP2\GraphicsProgramming\Graphics\BirdsAndEngines\Debug\BirdsAndEngines.exe

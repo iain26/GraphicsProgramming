@@ -13,7 +13,7 @@ public:
 		this->rot = rot;
 		this->scale = scale;
 	}
-
+	// get model matrix (used with vie and projection to get mvp)
 	inline glm::mat4 GetModel() const
 	{
 		glm::mat4 posMatrix = glm::translate(pos);

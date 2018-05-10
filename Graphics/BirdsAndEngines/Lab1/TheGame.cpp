@@ -50,7 +50,7 @@ void TheGame::Initialise()
 	// starting positons for game
 	SetInitialPositions();
 
-	PlaneShader.InitialiseShader("..\\res\\Shaders\\reflection");
+	PlaneShader.InitialiseShader("..\\res\\Shaders\\shaderRimToon");
 	OldShader.InitialiseShader("..\\res\\Shaders\\shader");
 	//DissShader.InitialiseShader("..\\res\\Shaders\\DissolveShader");
 	Skybox.InitialiseShader("..\\res\\Shaders\\Cubemap");
@@ -133,6 +133,8 @@ void TheGame::GameLoop()
 		}
 	}
 }
+
+#pragma region BirdChecks
 
 //checks if any birds are behind the camera
 void TheGame::CheckBirdsOutRange() {
@@ -287,6 +289,8 @@ void TheGame::CheckBird3Collision() {
 
 }
 
+#pragma endregion
+
 // checks inputs
 void TheGame::Keyboard()
 {
@@ -328,6 +332,8 @@ void TheGame::Keyboard()
 	}
 }
 
+#pragma region GeneralMethods(i.e dist and collision check)
+
 // finds distance between two points 
 float TheGame::Distance(glm::vec3 a, glm::vec3 b) {
 	return  glm::sqrt((b.x - a.x)*(b.x - a.x) + (b.y - a.y)*(b.y - a.y) + (b.z - a.z)*(b.z - a.z));
@@ -348,12 +354,18 @@ bool TheGame::Collided(glm::vec3 aP, float aR, glm::vec3 bP, float bR)
 	}
 }
 
+#pragma endregion
+
+
+
 void TheGame::SetToonLighting() {
 	PlaneShader.setVec3("lightDir", glm::vec3(0.5, 0.5, 0.0));
 	
 }
 
 void TheGame::SetRimToonLighting() {
+	//PlaneShader.InitialiseShader("..\\res\\Shaders\\shaderRimToon");
+	PlaneShader.Bind();
 	PlaneShader.setVec3("lightDir", glm::vec3(-0.5, -0.5, -0.5));
 	PlaneShader.setVec3("InputColor", glm::vec3(1.0, 0.5, 0.5));
 	PlaneShader.setMat4("u_vm", cam.GetView());
@@ -420,15 +432,15 @@ void TheGame::SetReflectionVertices() {
 }
 
 void TheGame::SetReflection() {
-	PlaneShader.setMat4("vp", cam.GetViewProjection());
-	PlaneShader.setMat4("m", planeMovements.GetModel());
+	PlaneShader.InitialiseShader("..\\res\\Shaders\\reflection");
+	PlaneShader.Bind();
+	//PlaneShader.setMat4("vp", cam.GetViewProjection());
+	//PlaneShader.setMat4("m", /*planeMovements.GetModel()*/glm::mat4(1.0f));
 	PlaneShader.setVec3("camPos", cam.GetPos());
 
 	glBindVertexArray(reflVAO);
-	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTex);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
 }
 
 void TheGame::SetSkybox() {
@@ -450,7 +462,7 @@ void TheGame::ObjectMGR() {
 
 	OldShader.Bind();
 	// sets active texture
-	//skyTexture.Bind(0);
+	skyTexture.Bind(0);
 	// updates the view projection
 	OldShader.UpdateShader(glm::vec3(0, 0, 0), cam);
 	// draw sphere 
@@ -466,9 +478,7 @@ void TheGame::ObjectMGR() {
 	planeMovements.SetRot(glm::vec3(planeRotX, 0, PlaneRotZ));
 	planeMovements.SetScale(glm::vec3(0.15, 0.15, 0.15));
 
-	PlaneShader.Bind();
 	SetReflection();
-
 	//SetRimToonLighting();
 
 	PlaneShader.UpdateShader(planeMovements, cam);
@@ -485,8 +495,7 @@ void TheGame::ObjectMGR() {
 		planePos.y + engineOffsety - (planeRotX * 2.5) - (PlaneRotZ * 2.5),
 		planePos.z + engineOffsetz + (planeRotX * 0.05));
 
-
-	//     b ird methods
+	//     bird methods
 
 	OldShader.Bind();
 	OldShader.UpdateShader(glm::vec3(0, 0, 0), cam);

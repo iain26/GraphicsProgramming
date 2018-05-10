@@ -91,5 +91,17 @@
     <None Include="..\res\Shaders\shaderRimToon.vert">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\res\Shaders\Cubemap.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Shaders\Cubemap.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Shaders\reflection.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Shaders\reflection.vert">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

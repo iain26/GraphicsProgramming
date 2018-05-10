@@ -3,6 +3,7 @@
 #include <string>
 #include <Windows.h>
 #include <ctime>
+#include "stb_image.h"
 
 // sets up display, method call to start gameloop, instantiates mesh plane and audio device
 TheGame::TheGame()
@@ -49,13 +50,26 @@ void TheGame::Initialise()
 	// starting positons for game
 	SetInitialPositions();
 
-	NewShader.InitialiseShader("..\\res\\Shaders\\shaderRimToon");
+	PlaneShader.InitialiseShader("..\\res\\Shaders\\reflection");
 	OldShader.InitialiseShader("..\\res\\Shaders\\shader");
-	DissShader.InitialiseShader("..\\res\\Shaders\\DissolveShader");
+	//DissShader.InitialiseShader("..\\res\\Shaders\\DissolveShader");
+	Skybox.InitialiseShader("..\\res\\Shaders\\Cubemap");
 
 	skyTexture.LoadTextureFile("..\\res\\Textures\\Sky.jpg");
 	planeTexture.LoadTextureFile("..\\res\\Textures\\Metal.jpg");
 	birdTexture.LoadTextureFile("..\\res\\Textures\\fur.jpg");
+
+	//skyboxFaces[0].LoadTextureFile("..\\res\\Textures\\Sky.jpg");
+	//skyboxFaces[1].LoadTextureFile("..\\res\\Textures\\Sky.jpg");
+	//skyboxFaces[2].LoadTextureFile("..\\res\\Textures\\Sky.jpg");
+	//skyboxFaces[3].LoadTextureFile("..\\res\\Textures\\Sky.jpg");
+	//skyboxFaces[4].LoadTextureFile("..\\res\\Textures\\Sky.jpg");
+	//skyboxFaces[5].LoadTextureFile("..\\res\\Textures\\Sky.jpg");
+
+	//skyboxFaces.size();
+
+	cubemapTex = SetSkyboxTex();
+	SetSkyboxVertices();
 }
 
 void TheGame::PlaySoundFiles(unsigned int soundFile, glm::vec3 origin)
@@ -88,6 +102,9 @@ void TheGame::GameLoop()
 		//PlaySoundFiles(jetSound, glm::vec3(0.0f, 0.0f, 0.0f));
 		// checks if engine has been hit too many times
 		if (HitsTaken >= HitLimit) {
+			cout << "Failed - Press any Key to Continue..." << endl;
+			string check;
+			cin >> check;
 			gameState = GameState::EXIT;
 		}
 		// sets seed for random
@@ -332,42 +349,129 @@ bool TheGame::Collided(glm::vec3 aP, float aR, glm::vec3 bP, float bR)
 }
 
 void TheGame::SetToonLighting() {
-	NewShader.setVec3("lightDir", glm::vec3(0.5, 0.5, 0.0));
-}
-
-void TheGame::SetRimToonLighting() {
-	NewShader.setVec3("lightDir", glm::vec3(0.5, 0.5, 0.0));
-	NewShader.setVec3("InputColor", glm::vec3(0.5, 1.0, 0.5));
-	NewShader.setMat4("u_vm", cam.GetView());
-	NewShader.setMat4("u_pm", cam.GetProjection());
-}
-
-void TheGame::SetDissolveShader() {
-	DissShader.setMat4("matrix_viewProjection", cam.GetViewProjection());
-	DissShader.setMat4("matrix_model", glm::mat4(1.0f));
+	PlaneShader.setVec3("lightDir", glm::vec3(0.5, 0.5, 0.0));
 	
 }
 
+void TheGame::SetRimToonLighting() {
+	PlaneShader.setVec3("lightDir", glm::vec3(-0.5, -0.5, -0.5));
+	PlaneShader.setVec3("InputColor", glm::vec3(1.0, 0.5, 0.5));
+	PlaneShader.setMat4("u_vm", cam.GetView());
+	PlaneShader.setMat4("u_pm", cam.GetProjection());
+}
+
+//void TheGame::SetDissolveShader() {
+//	DissShader.setMat4("matrix_viewProjection", cam.GetViewProjection());
+//	DissShader.setMat4("matrix_model", glm::mat4(1.0f));
+//	DissShader.SetTexture()
+//}
+
+unsigned int TheGame::SetSkyboxTex() {
+
+	unsigned int ID;
+	glGenTextures(1, &ID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
+
+	int width, height, nrChannels;
+	
+	for (GLuint i = 0; i < 6; i++)
+	{
+		unsigned char *data = stbi_load(skyTexture.GetFileName().c_str(), &width, &height, &nrChannels, 0);
+		if (data) {
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			stbi_image_free(data);
+		}
+		else {
+			std::cout << "Cubemap texture failed to load at path: " << skyTexture.GetFileName() << std::endl;
+			stbi_image_free(data);
+		}
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return ID;
+}
+
+void TheGame::SetSkyboxVertices() {
+
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *) 0);
+
+}
+
+void TheGame::SetReflectionVertices() {
+
+	glGenVertexArrays(1, &reflVAO);
+	glGenBuffers(1, &reflVBO);
+	glBindVertexArray(reflVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, reflVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
+}
+
+void TheGame::SetReflection() {
+	PlaneShader.setMat4("vp", cam.GetViewProjection());
+	PlaneShader.setMat4("m", planeMovements.GetModel());
+	PlaneShader.setVec3("camPos", cam.GetPos());
+
+	glBindVertexArray(reflVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTex);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+}
+
+void TheGame::SetSkybox() {
+	glDepthMask(GL_FALSE);
+	Skybox.Bind();
+	Skybox.setMat4("proj_view", cam.GetViewProjection());
+
+	glBindVertexArray(skyboxVAO);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTex);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDepthMask(GL_TRUE);
+}
+
 void TheGame::ObjectMGR() {
+
+	//    skybox method
+	SetSkybox();
+
+
 	OldShader.Bind();
 	// sets active texture
-	skyTexture.Bind(0);
+	//skyTexture.Bind(0);
 	// updates the view projection
 	OldShader.UpdateShader(glm::vec3(0, 0, 0), cam);
 	// draw sphere 
-	skySphere.RenderModel();
+	//skySphere.RenderModel();
 
 	//SetShader(OldShader);
+	
 
+
+	//         plane method
 	// sets position, rotation and scale for plane
 	planeMovements.SetPos(glm::vec3(PlaneRotZ *-5, planeRotX *-5, 10));
 	planeMovements.SetRot(glm::vec3(planeRotX, 0, PlaneRotZ));
 	planeMovements.SetScale(glm::vec3(0.15, 0.15, 0.15));
 
-	NewShader.Bind();
-	SetToonLighting();
+	PlaneShader.Bind();
+	SetReflection();
 
-	NewShader.UpdateShader(planeMovements, cam);
+	//SetRimToonLighting();
+
+	PlaneShader.UpdateShader(planeMovements, cam);
 	planeTexture.Bind(0);
 	plane.RenderModel();
 	// the sphere used for collision is set
@@ -381,6 +485,9 @@ void TheGame::ObjectMGR() {
 		planePos.y + engineOffsety - (planeRotX * 2.5) - (PlaneRotZ * 2.5),
 		planePos.z + engineOffsetz + (planeRotX * 0.05));
 
+
+	//     b ird methods
+
 	OldShader.Bind();
 	OldShader.UpdateShader(glm::vec3(0, 0, 0), cam);
 
@@ -392,7 +499,7 @@ void TheGame::ObjectMGR() {
 		bird1Movements.SetRot(glm::vec3(0.0, 0.0, 0.0));
 		bird1Movements.SetScale(glm::vec3(0.25, 0.25, 0.25));
 
-		NewShader.UpdateShader(bird1Movements, cam);
+		PlaneShader.UpdateShader(bird1Movements, cam);
 		birdTexture.Bind(0);
 		bird1.RenderModel();
 		bird1.SetBoundingSphere(*bird1Movements.GetPos(), 0.5f);
@@ -405,7 +512,7 @@ void TheGame::ObjectMGR() {
 		bird2Movements.SetPos(bird2OrigPos + (bird2Dir * bird2Incre));
 		bird2Movements.SetRot(glm::vec3(0.0, 0.0, 0.0));
 		bird2Movements.SetScale(glm::vec3(0.5, 0.5, 0.5));
-		NewShader.UpdateShader(bird2Movements, cam);
+		PlaneShader.UpdateShader(bird2Movements, cam);
 		birdTexture.Bind(0);
 		bird2.RenderModel();
 		bird2.SetBoundingSphere(*bird2Movements.GetPos(), 0.25f);
@@ -418,7 +525,7 @@ void TheGame::ObjectMGR() {
 		bird3Movements.SetRot(glm::vec3(0.0, 0.0, 0.0));
 		bird3Movements.SetScale(glm::vec3(0.5, 0.5, 0.5));
 
-		NewShader.UpdateShader(bird3Movements, cam);
+		PlaneShader.UpdateShader(bird3Movements, cam);
 		birdTexture.Bind(0);
 		bird3.RenderModel();
 		bird3.SetBoundingSphere(*bird3Movements.GetPos(), 0.25f);
@@ -426,16 +533,10 @@ void TheGame::ObjectMGR() {
 	}
 }
 
-void TheGame::SetShader(Shader shader)
-{
-	shader.Bind();
-	shader.UpdateShader(glm::vec3(0, 0, 0), cam);
-}
-
 void TheGame::Render()
 {
 	// sets display background to grey
-	displayWindow.ClearDisplay(0.5f, 0.5f, 0.5f, 1.0f);
+	displayWindow.ClearDisplay(1.0f, 0.5f, 0.5f, 1.0f);
 	// links shader to memory
 
 	ObjectMGR();

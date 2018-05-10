@@ -16,6 +16,7 @@ void Tex::LoadTextureFile(const std::string& file) {
 	{
 		std::cerr << "texture load failed" << file << std::endl;
 	}
+	fileName = file;
 	// num of textures to be generated and the array to assign twxtures to
 	glGenTextures(1, &handleTexture);
 	glBindTexture(GL_TEXTURE_2D, handleTexture);

@@ -96,8 +96,12 @@
     <ClInclude Include="transform.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\res\Shaders\Cubemap.frag" />
+    <None Include="..\res\Shaders\Cubemap.vert" />
     <None Include="..\res\Shaders\DissolveShader.frag" />
     <None Include="..\res\Shaders\DissolveShader.vert" />
+    <None Include="..\res\Shaders\reflection.frag" />
+    <None Include="..\res\Shaders\reflection.vert" />
     <None Include="..\res\Shaders\shader.vert" />
     <None Include="..\res\Shaders\shaderRimToon.frag" />
     <None Include="..\res\Shaders\shaderRimToon.vert" />

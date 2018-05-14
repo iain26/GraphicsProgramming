@@ -1,6 +1,6 @@
 #version 330
 
- in vec3 aPos;
+in vec3 aPos;
 
 out vec3 texCoord;
 

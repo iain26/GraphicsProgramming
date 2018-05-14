@@ -15,7 +15,8 @@ TheGame::TheGame()
 	Sound audio();
 
 	Shader* NewShader();
-	Shader* OldShader();
+	Shader* OldShader(); 
+	Shader* fogRimToon();
 }
 
 TheGame::~TheGame()
@@ -50,27 +51,22 @@ void TheGame::Initialise()
 	// starting positons for game
 	SetInitialPositions();
 
-	PlaneShader.LoadThreeShaders("..\\res\\Shaders\\shaderRimToon");
 	OldShader.InitialiseShader("..\\res\\Shaders\\shader");
 	//DissShader.InitialiseShader("..\\res\\Shaders\\DissolveShader");
 	Skybox.InitialiseShader("..\\res\\Shaders\\Cubemap");
 	VisNormShader.LoadThreeShaders("..\\res\\Shaders\\VisNormShader");
+	reflectionShader.InitialiseShader("..\\res\\Shaders\\reflection");
+	PlaneShader.InitialiseShader("..\\res\\Shaders\\shaderRimToon");
+	fogRimToon.InitialiseShader("..\\res\\Shaders\\shaderFogRimToon");
 
 	skyTexture.LoadTextureFile("..\\res\\Textures\\Sky.jpg");
 	planeTexture.LoadTextureFile("..\\res\\Textures\\Metal.jpg");
 	birdTexture.LoadTextureFile("..\\res\\Textures\\fur.jpg");
 
-	//skyboxFaces[0].LoadTextureFile("..\\res\\Textures\\Sky.jpg");
-	//skyboxFaces[1].LoadTextureFile("..\\res\\Textures\\Sky.jpg");
-	//skyboxFaces[2].LoadTextureFile("..\\res\\Textures\\Sky.jpg");
-	//skyboxFaces[3].LoadTextureFile("..\\res\\Textures\\Sky.jpg");
-	//skyboxFaces[4].LoadTextureFile("..\\res\\Textures\\Sky.jpg");
-	//skyboxFaces[5].LoadTextureFile("..\\res\\Textures\\Sky.jpg");
-
-	//skyboxFaces.size();
-
 	cubemapTex = SetSkyboxTex();
 	SetSkyboxVertices();
+
+	SetReflectionVertices();
 }
 
 void TheGame::PlaySoundFiles(unsigned int soundFile, glm::vec3 origin)
@@ -114,9 +110,8 @@ void TheGame::GameLoop()
 		{
 			// takes in keyboard 
 			Keyboard();
-			VisNormShader.Bind();
-			//Render(false);
-			Render(true);
+			ObjectMGR();
+			Render();
 
 
 			// checks if collision occurred with large sphere around plane
@@ -150,11 +145,16 @@ void TheGame::CheckBirdsOutRange() {
 		bird1Incre = 0;
 		bird1Movements.SetPos(bird1OrigPos);
 		// finds closest engine part and makes that he target
-		if (Distance(bird1OrigPos, rightEngine) < Distance(bird1OrigPos, leftEngine)) {
-			bird1target = rightEngine;
+		if (!invisible) {
+			if (Distance(bird1OrigPos, rightEngine) < Distance(bird1OrigPos, leftEngine)) {
+				bird1target = rightEngine;
+			}
+			else {
+				bird1target = leftEngine;
+			}
 		}
 		else {
-			bird1target = leftEngine;
+			bird1target = glm::vec3(rand() % 10 - 5, rand() % 10 - 5, 0);
 		}
 	}
 	// repeated
@@ -164,11 +164,16 @@ void TheGame::CheckBirdsOutRange() {
 		bird2OrigPos = glm::vec3(rand() % 60 - 30, rand() % 60 - 30, 100);
 		bird2Incre = 0;
 		bird2Movements.SetPos(bird2OrigPos);
-		if (Distance(bird2OrigPos, rightEngine) < Distance(bird2OrigPos, leftEngine)) {
-			bird2target = rightEngine;
+		if (!invisible) {
+			if (Distance(bird2OrigPos, rightEngine) < Distance(bird2OrigPos, leftEngine)) {
+				bird2target = rightEngine;
+			}
+			else {
+				bird2target = leftEngine;
+			}
 		}
 		else {
-			bird2target = leftEngine;
+			bird2target = glm::vec3(rand() % 10 - 5, rand() % 10 - 5, 0);
 		}
 	}
 
@@ -179,11 +184,16 @@ void TheGame::CheckBirdsOutRange() {
 		bird3OrigPos = glm::vec3(-bird2OrigPos.x, -bird2OrigPos.y, 100);
 		bird3Incre = 0;
 		bird3Movements.SetPos(bird3OrigPos);
-		if (Distance(bird3OrigPos, rightEngine) < Distance(bird3OrigPos, leftEngine)) {
-			bird3target = rightEngine;
+		if (!invisible) {
+			if (Distance(bird3OrigPos, rightEngine) < Distance(bird3OrigPos, leftEngine)) {
+				bird3target = rightEngine;
+			}
+			else {
+				bird3target = leftEngine;
+			}
 		}
 		else {
-			bird3target = leftEngine;
+			bird3target = glm::vec3(rand() % 10 - 5, rand() % 10 - 5, 0);
 		}
 	}
 }
@@ -329,6 +339,16 @@ void TheGame::Keyboard()
 				PlaneRotZ -= 0.005f;
 		}
 
+		if (ks[SDL_SCANCODE_SPACE]) {
+			// esc pressed then quit the game loop
+			invisiblePressed = true;
+			invisibleTimer = invisibleTimer - 0.01f;
+		}
+		else {
+			invisiblePressed = false;
+			invisibleTimer = 4;
+		}
+
 		if (ks[SDL_SCANCODE_ESCAPE]) {
 			// esc pressed then quit the game loop
 			gameState = GameState::EXIT;
@@ -360,8 +380,6 @@ bool TheGame::Collided(glm::vec3 aP, float aR, glm::vec3 bP, float bR)
 
 #pragma endregion
 
-
-
 void TheGame::SetToonLighting() {
 	PlaneShader.setVec3("lightDir", glm::vec3(0.5, 0.5, 0.0));
 	
@@ -391,11 +409,12 @@ void TheGame::SetRimToonLighting() {
 		break;
 	}
 	PlaneShader.Bind();
-	PlaneShader.setVec3("lightDir", glm::vec3(1.5, 2.5, 3.5));
+	PlaneShader.setVec3("lightDir", glm::vec3(1.0, 3.0, 1.0));
 	PlaneShader.setVec3("InputColor", glm::vec3(0.5, 0.5, 0.5));
 	PlaneShader.setMat4("u_vm", cam.GetView());
 	PlaneShader.setMat4("u_pm", cam.GetProjection());
-	PlaneShader.setFloat("time", explosionFactor);
+	PlaneShader.setMat4("v_pos", planeMovements.GetModel());
+	//PlaneShader.setFloat("time", explosionFactor);
 }
 
 //void TheGame::SetDissolveShader() {
@@ -465,18 +484,83 @@ void TheGame::SetReflectionVertices() {
 }
 
 void TheGame::SetReflection() {
-	PlaneShader.InitialiseShader("..\\res\\Shaders\\reflection");
-	PlaneShader.Bind();
-	//PlaneShader.setMat4("vp", cam.GetViewProjection());
-	//PlaneShader.setMat4("m", /*planeMovements.GetModel()*/glm::mat4(1.0f));
-	PlaneShader.setVec3("camPos", cam.GetPos());
+	reflectionShader.Bind();
+	reflectionShader.setMat4("vp", cam.GetViewProjection());
+	reflectionShader.setMat4("m", planeMovements.GetModel());
+	reflectionShader.setVec3("camPos", cam.GetPos());
 
 	glBindVertexArray(reflVAO);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTex);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
-void TheGame::SetSkybox() {
+void TheGame::SetFogRimToon() {
+	fogRimToon.Bind();
+	fogRimToon.setMat4("u_pm", cam.GetProjection());
+	fogRimToon.setMat4("u_vm", cam.GetView());
+	fogRimToon.setVec3("lightDir", glm::vec3(1.0, 3.0, 1.0));
+	fogRimToon.setVec3("InputColor", glm::vec3(2.0, 0.5, 0.5));
+	fogRimToon.setFloat("maxDist", 4);
+	fogRimToon.setFloat("minDist", -4);
+	fogRimToon.setFloat("zPos", bird1.getBoundingSpherePos().z -4 );
+	fogRimToon.setMat4("v_pos", bird1Movements.GetModel());
+}
+
+void TheGame::SetPlaneTransforms() {
+	// plane transforms
+	planeMovements.SetPos(glm::vec3(PlaneRotZ *-5, planeRotX *-5, 10));
+	planeMovements.SetRot(glm::vec3(planeRotX, 0, PlaneRotZ));
+	planeMovements.SetScale(glm::vec3(0.15, 0.15, 0.15));
+	plane.SetBoundingSphere(*planeMovements.GetPos(), 7.0f);
+	// left engine and right engine position found by calculating rotation and each engine offset
+	planePos = *planeMovements.GetPos();
+	leftEngine = glm::vec3(planePos.x + engineOffsetx - (PlaneRotZ * 0.05),
+		planePos.y + engineOffsety - (planeRotX * 2.5) + (PlaneRotZ * 2.5),
+		planePos.z + engineOffsetz + (planeRotX * 0.05));
+	rightEngine = glm::vec3(planePos.x - engineOffsetx - (PlaneRotZ * 0.05),
+		planePos.y + engineOffsety - (planeRotX * 2.5) - (PlaneRotZ * 2.5),
+		planePos.z + engineOffsetz + (planeRotX * 0.05));
+}
+
+void TheGame::SetBirdTransforms() 
+	{
+		// gets the direction to travel
+		glm::vec3 bird1Dir = bird1OrigPos - bird1target;
+		// sets position equal to starting point plus the direction tomes by progrssion of increment 
+		bird1Movements.SetPos(bird1OrigPos + (bird1Dir * bird1Incre));
+		bird1Movements.SetRot(glm::vec3(0.0, 0.0, 0.0));
+		bird1Movements.SetScale(glm::vec3(0.25, 0.25, 0.25));
+		bird1.SetBoundingSphere(*bird1Movements.GetPos(), 0.5f);
+		// plusses over time and transforms bird along path
+		bird1Incre = bird1Incre - 0.015f;
+	
+	// repeated for other 2 bird models
+	
+		glm::vec3 bird2Dir = bird2OrigPos - bird2target;
+		bird2Movements.SetPos(bird2OrigPos + (bird2Dir * bird2Incre));
+		bird2Movements.SetRot(glm::vec3(0.0, 0.0, 0.0));
+		bird2Movements.SetScale(glm::vec3(0.5, 0.5, 0.5));
+		bird2.SetBoundingSphere(*bird2Movements.GetPos(), 0.25f);
+		bird2Incre = bird2Incre - 0.01f;
+	
+		glm::vec3 bird3Dir = bird3OrigPos - bird3target;
+		bird3Movements.SetPos(bird3OrigPos + (bird3Dir * bird3Incre));
+		bird3Movements.SetRot(glm::vec3(0.0, 0.0, 0.0));
+		bird3Movements.SetScale(glm::vec3(0.5, 0.5, 0.5));
+		bird3.SetBoundingSphere(*bird3Movements.GetPos(), 0.25f);
+		bird3Incre = bird3Incre - 0.01f;
+	
+}
+
+void TheGame::ObjectMGR() {
+
+	SetPlaneTransforms();
+
+	SetBirdTransforms();
+	
+}
+
+void TheGame::DrawSkyBox() {
 	glDepthMask(GL_FALSE);
 	Skybox.Bind();
 	Skybox.setMat4("proj_view", cam.GetViewProjection());
@@ -487,111 +571,42 @@ void TheGame::SetSkybox() {
 	glDepthMask(GL_TRUE);
 }
 
-void TheGame::ObjectMGR(bool loadShaders) {
-
-	//    skybox method
-	if (loadShaders) {
-		SetSkybox();
-
-
-		OldShader.Bind();
-		// sets active texture
-		skyTexture.Bind(0);
-		// updates the view projection
-		OldShader.UpdateShader(glm::vec3(0, 0, 0), cam);
-		// draw sphere 
-		//skySphere.RenderModel();
-
-		//SetShader(OldShader);
+void TheGame::DrawPlane() {
+	if (invisiblePressed && invisibleTimer > 0) {
+		invisible = true;
+		reflectionShader.Bind();
+		SetReflection();
+		reflectionShader.UpdateShader(planeMovements, cam);
 	}
-	
-
-
-	//         plane method
-	// sets position, rotation and scale for plane
-	planeMovements.SetPos(glm::vec3(PlaneRotZ *-5, planeRotX *-5, 10));
-	planeMovements.SetRot(glm::vec3(planeRotX, 0, PlaneRotZ));
-	planeMovements.SetScale(glm::vec3(0.15, 0.15, 0.15));
-
-	//SetVisNormShader();
-	//plane.RenderModel();
-	//SetVisNormShader();
-	//plane.RenderModel();
-	//SetReflection();
-	if (loadShaders) {
+	else {
+		invisible = false;
+		PlaneShader.Bind();
 		SetRimToonLighting();
-
 		PlaneShader.UpdateShader(planeMovements, cam);
 	}
 	planeTexture.Bind(0);
 	plane.RenderModel();
-	// the sphere used for collision is set
-	plane.SetBoundingSphere(*planeMovements.GetPos(), 7.0f);
-	// left engine and right engine position found by calculating rotation and each engine offset
-	planePos = *planeMovements.GetPos();
-	leftEngine = glm::vec3(planePos.x + engineOffsetx - (PlaneRotZ * 0.05),
-		planePos.y + engineOffsety - (planeRotX * 2.5) + (PlaneRotZ * 2.5),
-		planePos.z + engineOffsetz + (planeRotX * 0.05));
-	rightEngine = glm::vec3(planePos.x - engineOffsetx - (PlaneRotZ * 0.05),
-		planePos.y + engineOffsety - (planeRotX * 2.5) - (PlaneRotZ * 2.5),
-		planePos.z + engineOffsetz + (planeRotX * 0.05));
-
-	//     bird methods
-	if (loadShaders) {
-		OldShader.Bind();
-		OldShader.UpdateShader(glm::vec3(0, 0, 0), cam);
-	}
-
-	{
-		// gets the direction to travel
-		glm::vec3 bird1Dir = bird1OrigPos - bird1target;
-		// sets position equal to starting point plus the direction tomes by progrssion of increment 
-		bird1Movements.SetPos(bird1OrigPos + (bird1Dir * bird1Incre));
-		bird1Movements.SetRot(glm::vec3(0.0, 0.0, 0.0));
-		bird1Movements.SetScale(glm::vec3(0.25, 0.25, 0.25));
-
-		PlaneShader.UpdateShader(bird1Movements, cam);
-		birdTexture.Bind(0);
-		bird1.RenderModel();
-		bird1.SetBoundingSphere(*bird1Movements.GetPos(), 0.5f);
-		// plusses over time and transforms bird along path
-		bird1Incre = bird1Incre - 0.015f;
-	}
-	// repeated for other 2 bird models
-	{
-		glm::vec3 bird2Dir = bird2OrigPos - bird2target;
-		bird2Movements.SetPos(bird2OrigPos + (bird2Dir * bird2Incre));
-		bird2Movements.SetRot(glm::vec3(0.0, 0.0, 0.0));
-		bird2Movements.SetScale(glm::vec3(0.5, 0.5, 0.5));
-		PlaneShader.UpdateShader(bird2Movements, cam);
-		birdTexture.Bind(0);
-		bird2.RenderModel();
-		bird2.SetBoundingSphere(*bird2Movements.GetPos(), 0.25f);
-		bird2Incre = bird2Incre - 0.01f;
-	}
-
-	{
-		glm::vec3 bird3Dir = bird3OrigPos - bird3target;
-		bird3Movements.SetPos(bird3OrigPos + (bird3Dir * bird3Incre));
-		bird3Movements.SetRot(glm::vec3(0.0, 0.0, 0.0));
-		bird3Movements.SetScale(glm::vec3(0.5, 0.5, 0.5));
-
-		PlaneShader.UpdateShader(bird3Movements, cam);
-		birdTexture.Bind(0);
-		bird3.RenderModel();
-		bird3.SetBoundingSphere(*bird3Movements.GetPos(), 0.25f);
-		bird3Incre = bird3Incre - 0.01f;
-	}
 }
 
-void TheGame::Render(bool loadShaders)
+void TheGame::DrawBirds() {
+	SetFogRimToon();
+	birdTexture.Bind(0);
+	fogRimToon.UpdateShader(bird1Movements, cam);
+	bird1.RenderModel();
+	//SetVisNormShader();
+	fogRimToon.UpdateShader(bird2Movements, cam);
+	bird2.RenderModel();
+	fogRimToon.UpdateShader(bird3Movements, cam);
+	bird3.RenderModel();
+}
+
+void TheGame::Render()
 {
 	// sets display background to grey
 	displayWindow.ClearDisplay(1.0f, 0.5f, 0.5f, 1.0f);
-	// links shader to memory
-
-	ObjectMGR(loadShaders);
-
+	DrawSkyBox();
+	DrawPlane();
+	DrawBirds();
 	glEnableClientState(GL_COLOR_ARRAY); 
 	glEnd();
 	// swap over to other background window

@@ -25,7 +25,10 @@ private:
 	void Initialise();
 	void Keyboard();
 	void GameLoop();
-	void Render(bool loadShaders); 
+	void Render(); 
+
+	void DrawPlane();
+	void DrawBirds();
 
 	void CheckBird1Collision();
 	void CheckBird2Collision();
@@ -38,7 +41,9 @@ private:
 	float Distance(glm::vec3 a, glm::vec3 b);
 	void PlaySoundFiles(unsigned int file, glm::vec3 pos);
 
-	void ObjectMGR(bool loadShaders);
+	void ObjectMGR();
+	void SetPlaneTransforms();
+	void SetBirdTransforms();
 
 	DisplayWindow displayWindow;
 	GameState gameState;
@@ -82,6 +87,10 @@ private:
 	int HitsTaken = 0;
 	int HitLimit = 6;
 
+	bool invisiblePressed = false;
+	float invisibleTimer = 4;
+	bool invisible = false;
+
 	Sound audio;
 	unsigned int jetSound;
 	unsigned int hitSound;
@@ -89,9 +98,11 @@ private:
 
 	Shader PlaneShader;
 	Shader OldShader;
-	//Shader DissShader;
+	Shader DissShader;
 	Shader birdShader;
 	Shader Skybox;
+	Shader reflectionShader;
+	Shader fogRimToon;
 	Shader VisNormShader;
 
 	unsigned int cubemapTex;
@@ -104,12 +115,13 @@ private:
 	void SetToonLighting();
 	void SetRimToonLighting();
 	void SetReflection();
+	void SetFogRimToon();
 	void SetVisNormShader();
 	//void SetDissolveShader();
 
 	unsigned int SetSkyboxTex();
 	void SetSkyboxVertices();
-	void SetSkybox();
+	void DrawSkyBox();
 
 	GLuint reflVAO, reflVBO;
 	void SetReflectionVertices();

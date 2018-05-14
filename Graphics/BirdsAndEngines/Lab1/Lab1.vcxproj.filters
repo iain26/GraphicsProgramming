@@ -115,5 +115,17 @@
     <None Include="..\res\Shaders\shaderRimToon.geo">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\res\Shaders\fog.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Shaders\fog.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Shaders\shaderFogRimToon.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Shaders\shaderFogRimToon.vert">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

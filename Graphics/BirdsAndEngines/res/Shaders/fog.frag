@@ -1,45 +1,51 @@
 #version 400
 
-in vec3 Position;
-in vec3 Normal;
+in vec3 v_norm;
+in vec4 v_pos; 
 
-struct tLightInfo{
-vec4 position;
-vec3 intensity;
-};
+uniform vec3 lightDir;
+uniform vec3 fogColor;
 
-uniform LightInfo Light;
+uniform mat4 u_pm; 
+uniform mat4 u_vm;
 
-struct FogInfo {
-float maxDist;
-float minDist;
-vec3 color;
-};
-uniform FogInfo Fog;
+uniform float maxDist;
+uniform float minDist;   
 
-uniform vec3 Kd;
-uniform vec3 Ka;
-uniform vec3 Ks;
-uniform float Shininess;
+uniform float zPos;
 
 layout ( Location = 0 ) out vec4 FragColor;
 
-vec3 ads(){
-vec3 s = normalize (light.position.xyz - position.xyz);
-vec3 v = normalize (vec3(-position));
-vec3 h = normalize ( v + s);
-vec3 ambient = Ka * Light.intensity;
-vec3 diffuse = Light.intensity * kD * max (0.0, dot(s, Normal) );
-vec3 spec = Light.intensity * Ks * pow( max(0.0, dot ( h, Normal) ), shininess );
-return ambient + diffuse + spec;
+vec3 toonRim(){
+  vec3 n = normalize(mat3(u_vm) * v_norm);    
+  vec3 p = vec3((u_pm) * v_pos);             
+  vec3 v = normalize(p);                      
+  float vdn = 0.6 - max(dot(v, n), 0.0);       
+ 
+ 	float intensity;
+	vec4 color;
+	intensity = dot(lightDir,v_norm);
+
+	if (intensity > 0.95)
+		color = vec4(0.6,0.5,0.5,1.0);
+	else if (intensity > 0.5)
+		color = vec4(0.5,0.3,0.3,1.0);
+	else if (intensity > 0.25)
+		color = vec4(0.4,0.2,0.2,1.0);
+	else
+		color = vec4(0.2,0.1,0.1,1.0);
+
+  return vec3(smoothstep(0.4, 0.6, vdn)) * color.xyz; 
 }
 
 void main()
 {
-	float dist = abs(Position.z);
-	float fogFactor = (Fog.maxDist - dist)/(fog.maxDist - fog.minDist);
-	fogFactor = clamp ( fogFactor, 0.0, 1.0 );
-	vec3 shadeColor = ads();
-	vec3 color = mix ( fog.color, shadeColor, fogFactor);
-	FragColor = vec4(color, 1.0);
+float dist = abs(zPos);
+float fogFactor = (maxDist - dist) / (maxDist - minDist);
+fogFactor = clamp( fogFactor, 0.0, 1.0 );
+vec3 toonRim = toonRim(); 
+
+vec3 color = mix( fogColor, toonRim, fogFactor);
+FragColor = vec4(color, 1.0);
+
 }

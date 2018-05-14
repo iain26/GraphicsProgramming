@@ -8,7 +8,7 @@ uniform vec3 InputColor;
 layout( location = 0 ) out vec4 fragcolor;
  
 in vec3 v_norm;
-in vec4 v_pos; 
+uniform mat4 v_pos; 
  
 void main() {
  
@@ -22,13 +22,13 @@ void main() {
 	intensity = dot(lightDir,v_norm);
 
 	if (intensity > 0.95)
-		color = vec4(0.5, 0.5, 0.5,1.0);
+		color = vec4(InputColor,1.0);
 	else if (intensity > 0.5)
-		color = vec4(0.3,0.3,0.3,1.0);
+		color = vec4(InputColor/2,1.0);
 	else if (intensity > 0.25)
-		color = vec4(0.2,0.2,0.2,1.0);
+		color = vec4(InputColor/4,1.0);
 	else
-		color = vec4(0.1,0.1,0.1,1.0);
+		color = vec4(InputColor/8,1.0);
 
   fragcolor.a = 0.6;
   fragcolor.rgb = vec3(smoothstep(0.4, 1.3, vdn)) + vec3(color.x,color.y,color.z);

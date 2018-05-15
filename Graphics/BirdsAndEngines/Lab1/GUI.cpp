@@ -31,9 +31,9 @@ void GUI::DrawQuad(float offset) {
 	Overlay.Bind(0);
 	glDisable(GL_LIGHTING);
 
+	glColor3f(1, 1, 1);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, Overlay.GetTexHandler());
-	glColor3f(1, 1, 1);
 
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 1.0f); glVertex2f(0.05f + offset, -0.95f);
@@ -41,6 +41,8 @@ void GUI::DrawQuad(float offset) {
 	glTexCoord2f(1.0f, 0.0f); glVertex2f(0.15f + offset, -0.85f);
 	glTexCoord2f(0.0f, 0.0f); glVertex2f(0.05f + offset, -0.85f);
 	glEnd();
+
+	glDisable(GL_TEXTURE_2D);
 }
 
 GUI::~GUI()

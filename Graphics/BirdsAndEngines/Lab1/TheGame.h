@@ -8,6 +8,7 @@
 #include "transform.h"
 #include "Sound.h"
 #include "Cam.h"
+#include "GUI.h"
 #include <vector>
 
 enum class GameState{MENU, PLAY, EXIT};
@@ -97,13 +98,15 @@ private:
 	unsigned int chirpSound;
 
 	Shader PlaneShader;
-	Shader OldShader;
-	Shader DissShader;
+	//Shader OldShader;
+	//Shader DissShader;
 	Shader birdShader;
 	Shader Skybox;
 	Shader reflectionShader;
+	Shader refractionShader;
 	Shader fogRimToon;
-	Shader VisNormShader;
+	Shader explodingShader;
+	//Shader VisNormShader;
 
 	unsigned int cubemapTex;
 	GLuint skyboxVAO, skyboxVBO;
@@ -112,12 +115,21 @@ private:
 	Tex planeTexture;
 	Tex birdTexture;
 
+	GUI OL;
+	Shader OverlayShader;
+
 	void SetToonLighting();
 	void SetRimToonLighting();
 	void SetReflection();
+	void SetRefraction();
 	void SetFogRimToon();
-	void SetVisNormShader();
+	void SetExplosion();
+	//void SetVisNormShader();
 	//void SetDissolveShader();
+
+	float explosionFactor;
+
+	void DrawOverlay();
 
 	unsigned int SetSkyboxTex();
 	void SetSkyboxVertices();

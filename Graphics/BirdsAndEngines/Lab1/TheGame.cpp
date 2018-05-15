@@ -51,17 +51,22 @@ void TheGame::Initialise()
 	// starting positons for game
 	SetInitialPositions();
 
-	OldShader.InitialiseShader("..\\res\\Shaders\\shader");
+	//OldShader.InitialiseShader("..\\res\\Shaders\\shader");
 	//DissShader.InitialiseShader("..\\res\\Shaders\\DissolveShader");
 	Skybox.InitialiseShader("..\\res\\Shaders\\Cubemap");
-	VisNormShader.LoadThreeShaders("..\\res\\Shaders\\VisNormShader");
+	//VisNormShader.LoadThreeShaders("..\\res\\Shaders\\VisNormShader");
 	reflectionShader.InitialiseShader("..\\res\\Shaders\\reflection");
+	refractionShader.InitialiseShader("..\\res\\Shaders\\refraction");
 	PlaneShader.InitialiseShader("..\\res\\Shaders\\shaderRimToon");
 	fogRimToon.InitialiseShader("..\\res\\Shaders\\shaderFogRimToon");
+	explodingShader.LoadThreeShaders("..\\res\\Shaders\\shaderFogRimToon");
+	OverlayShader.InitialiseShader("..\\res\\Shaders\\shaderOverlay");
 
 	skyTexture.LoadTextureFile("..\\res\\Textures\\Sky.jpg");
 	planeTexture.LoadTextureFile("..\\res\\Textures\\Metal.jpg");
 	birdTexture.LoadTextureFile("..\\res\\Textures\\fur.jpg");
+
+	OL.LoadTex("..\\res\\Textures\\spiderman.jpg");
 
 	cubemapTex = SetSkyboxTex();
 	SetSkyboxVertices();
@@ -386,35 +391,12 @@ void TheGame::SetToonLighting() {
 }
 
 void TheGame::SetRimToonLighting() {
-	//PlaneShader.InitialiseShader("..\\res\\Shaders\\shaderRimToon");
-	float explosionFactor;
-	switch (HitsTaken) {
-	case 0:
-		explosionFactor = -1.6;
-		break;
-	case 1:
-		explosionFactor = -1.45;
-		break;
-	case 2:
-		explosionFactor = -1.30;
-		break;
-	case 3:
-		explosionFactor = -1.15;
-		break;
-	case 4:
-		explosionFactor = -1.0;
-		break;
-	case 5:
-		explosionFactor = -0.85;
-		break;
-	}
 	PlaneShader.Bind();
 	PlaneShader.setVec3("lightDir", glm::vec3(1.0, 3.0, 1.0));
 	PlaneShader.setVec3("InputColor", glm::vec3(0.5, 0.5, 0.5));
 	PlaneShader.setMat4("u_vm", cam.GetView());
 	PlaneShader.setMat4("u_pm", cam.GetProjection());
 	PlaneShader.setMat4("v_pos", planeMovements.GetModel());
-	//PlaneShader.setFloat("time", explosionFactor);
 }
 
 //void TheGame::SetDissolveShader() {
@@ -423,12 +405,12 @@ void TheGame::SetRimToonLighting() {
 //	DissShader.SetTexture()
 //}
 
-void TheGame::SetVisNormShader() {
-	VisNormShader.Bind();
-	VisNormShader.setMat4("m", planeMovements.GetModel());
-	VisNormShader.setMat4("v", cam.GetView());
-	VisNormShader.setMat4("p", cam.GetProjection());
-}
+//void TheGame::SetVisNormShader() {
+//	VisNormShader.Bind();
+//	VisNormShader.setMat4("m", planeMovements.GetModel());
+//	VisNormShader.setMat4("v", cam.GetView());
+//	VisNormShader.setMat4("p", cam.GetProjection());
+//}
 
 unsigned int TheGame::SetSkyboxTex() {
 
@@ -486,8 +468,19 @@ void TheGame::SetReflectionVertices() {
 void TheGame::SetReflection() {
 	reflectionShader.Bind();
 	reflectionShader.setMat4("vp", cam.GetViewProjection());
-	reflectionShader.setMat4("m", planeMovements.GetModel());
+	reflectionShader.setMat4("m", bird3Movements.GetModel());
 	reflectionShader.setVec3("camPos", cam.GetPos());
+
+	glBindVertexArray(reflVAO);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTex);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void TheGame::SetRefraction() {
+	refractionShader.Bind();
+	refractionShader.setMat4("vp", cam.GetViewProjection());
+	refractionShader.setMat4("m", planeMovements.GetModel());
+	refractionShader.setVec3("camPos", cam.GetPos());
 
 	glBindVertexArray(reflVAO);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTex);
@@ -499,11 +492,24 @@ void TheGame::SetFogRimToon() {
 	fogRimToon.setMat4("u_pm", cam.GetProjection());
 	fogRimToon.setMat4("u_vm", cam.GetView());
 	fogRimToon.setVec3("lightDir", glm::vec3(1.0, 3.0, 1.0));
-	fogRimToon.setVec3("InputColor", glm::vec3(2.0, 0.5, 0.5));
+	fogRimToon.setVec3("InputColor", glm::vec3(1.0, 0.0, 0.0));
 	fogRimToon.setFloat("maxDist", 4);
 	fogRimToon.setFloat("minDist", -4);
-	fogRimToon.setFloat("zPos", bird1.getBoundingSpherePos().z -4 );
+	fogRimToon.setFloat("zPos", bird1.getBoundingSpherePos().z);
 	fogRimToon.setMat4("v_pos", bird1Movements.GetModel());
+}
+
+void TheGame::SetExplosion() {
+	explodingShader.Bind();
+	explodingShader.setMat4("u_pm", cam.GetProjection());
+	explodingShader.setMat4("u_vm", cam.GetView());
+	explodingShader.setVec3("lightDir", glm::vec3(1.0, 3.0, 1.0));
+	explodingShader.setVec3("InputColor", glm::vec3(1.0, 0.0, 0.0));
+	explodingShader.setFloat("maxDist", 4);
+	explodingShader.setFloat("minDist", -4);
+	explodingShader.setFloat("zPos", bird2.getBoundingSpherePos().z);
+	explodingShader.setMat4("v_pos", bird2Movements.GetModel());
+	explodingShader.setFloat("time", explosionFactor);
 }
 
 void TheGame::SetPlaneTransforms() {
@@ -532,7 +538,7 @@ void TheGame::SetBirdTransforms()
 		bird1Movements.SetScale(glm::vec3(0.25, 0.25, 0.25));
 		bird1.SetBoundingSphere(*bird1Movements.GetPos(), 0.5f);
 		// plusses over time and transforms bird along path
-		bird1Incre = bird1Incre - 0.015f;
+		bird1Incre = bird1Incre - 0.005f;
 	
 	// repeated for other 2 bird models
 	
@@ -541,18 +547,20 @@ void TheGame::SetBirdTransforms()
 		bird2Movements.SetRot(glm::vec3(0.0, 0.0, 0.0));
 		bird2Movements.SetScale(glm::vec3(0.5, 0.5, 0.5));
 		bird2.SetBoundingSphere(*bird2Movements.GetPos(), 0.25f);
-		bird2Incre = bird2Incre - 0.01f;
+		bird2Incre = bird2Incre - 0.005f;
 	
 		glm::vec3 bird3Dir = bird3OrigPos - bird3target;
 		bird3Movements.SetPos(bird3OrigPos + (bird3Dir * bird3Incre));
 		bird3Movements.SetRot(glm::vec3(0.0, 0.0, 0.0));
 		bird3Movements.SetScale(glm::vec3(0.5, 0.5, 0.5));
 		bird3.SetBoundingSphere(*bird3Movements.GetPos(), 0.25f);
-		bird3Incre = bird3Incre - 0.01f;
+		bird3Incre = bird3Incre - 0.005f;
 	
 }
 
 void TheGame::ObjectMGR() {
+
+	explosionFactor = explosionFactor + 0.05f;
 
 	SetPlaneTransforms();
 
@@ -575,8 +583,8 @@ void TheGame::DrawPlane() {
 	if (invisiblePressed && invisibleTimer > 0) {
 		invisible = true;
 		reflectionShader.Bind();
-		SetReflection();
-		reflectionShader.UpdateShader(planeMovements, cam);
+		SetRefraction();
+		refractionShader.UpdateShader(planeMovements, cam);
 	}
 	else {
 		invisible = false;
@@ -593,22 +601,31 @@ void TheGame::DrawBirds() {
 	birdTexture.Bind(0);
 	fogRimToon.UpdateShader(bird1Movements, cam);
 	bird1.RenderModel();
-	//SetVisNormShader();
-	fogRimToon.UpdateShader(bird2Movements, cam);
+	SetExplosion();
+	explodingShader.UpdateShader(bird2Movements, cam);
 	bird2.RenderModel();
-	fogRimToon.UpdateShader(bird3Movements, cam);
+	SetReflection();
+	reflectionShader.UpdateShader(bird3Movements, cam);
 	bird3.RenderModel();
+}
+
+void TheGame::DrawOverlay() {
+	OverlayShader.Bind();
+	OL.Draw(displayWindow.GetWidth(), displayWindow.GetHeight());
 }
 
 void TheGame::Render()
 {
-	// sets display background to grey
 	displayWindow.ClearDisplay(1.0f, 0.5f, 0.5f, 1.0f);
 	DrawSkyBox();
 	DrawPlane();
 	DrawBirds();
+
+	DrawOverlay();
+
 	glEnableClientState(GL_COLOR_ARRAY); 
 	glEnd();
+
 	// swap over to other background window
 	displayWindow.SwapBuff();
 } 

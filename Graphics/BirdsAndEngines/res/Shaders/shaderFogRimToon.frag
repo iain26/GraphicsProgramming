@@ -19,7 +19,7 @@ vec3 ToonRim() {
  
 	vec3 n = normalize(mat3(u_vm) * v_norm);      
 	vec3 p = vec3((u_pm) * v_pos);               
-	vec3 v = normalize(p);                        
+	vec3 v = normalize(-p);                        
 	float vdn = 0.6 - max(dot(v, n), 0.0);       
 	
 	float intensity;

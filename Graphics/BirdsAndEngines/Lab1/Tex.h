@@ -11,6 +11,8 @@ public:
 
 	std::string GetFileName() { return fileName; };
 
+	GLuint GetTexHandler() { return handleTexture; };
+
 	void Bind(unsigned int unit); // bind upto 32 textures
 
 	~Tex();

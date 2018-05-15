@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D246FDDF-B30E-4F14-80F8-095FA4E04ECF}</ProjectGuid>
     <RootNamespace>Lab1</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
     <ProjectName>BirdsAndEngines</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -73,6 +73,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GUI.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="DisplayWindow.cpp" />
     <ClCompile Include="main.cpp" />
@@ -84,6 +85,7 @@
     <ClCompile Include="Tex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GUI.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Cam.h" />
     <ClInclude Include="DisplayWindow.h" />
@@ -94,25 +96,6 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Tex.h" />
     <ClInclude Include="transform.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\res\Shaders\Cubemap.frag" />
-    <None Include="..\res\Shaders\Cubemap.vert" />
-    <None Include="..\res\Shaders\DissolveShader.frag" />
-    <None Include="..\res\Shaders\DissolveShader.vert" />
-    <None Include="..\res\Shaders\fog.frag" />
-    <None Include="..\res\Shaders\fog.vert" />
-    <None Include="..\res\Shaders\reflection.frag" />
-    <None Include="..\res\Shaders\reflection.vert" />
-    <None Include="..\res\Shaders\shader.vert" />
-    <None Include="..\res\Shaders\shaderFogRimToon.frag" />
-    <None Include="..\res\Shaders\shaderFogRimToon.vert" />
-    <None Include="..\res\Shaders\shaderRimToon.frag" />
-    <None Include="..\res\Shaders\shaderRimToon.geo" />
-    <None Include="..\res\Shaders\shaderRimToon.vert" />
-    <None Include="..\res\Shaders\VisNormShader.frag" />
-    <None Include="..\res\Shaders\VisNormShader.geo" />
-    <None Include="..\res\Shaders\VisNormShader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

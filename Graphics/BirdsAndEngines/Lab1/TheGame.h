@@ -92,6 +92,8 @@ private:
 	float invisibleTimer = 4;
 	bool invisible = false;
 
+	bool visibleNormals = false;
+
 	Sound audio;
 	unsigned int jetSound;
 	unsigned int hitSound;
@@ -106,7 +108,7 @@ private:
 	Shader refractionShader;
 	Shader fogRimToon;
 	Shader explodingShader;
-	//Shader VisNormShader;
+	Shader VisNormShader;
 
 	unsigned int cubemapTex;
 	GLuint skyboxVAO, skyboxVBO;
@@ -115,7 +117,7 @@ private:
 	Tex planeTexture;
 	Tex birdTexture;
 
-	GUI OL;
+	GUI healthSquare;
 	Shader OverlayShader;
 
 	void SetToonLighting();
@@ -124,7 +126,7 @@ private:
 	void SetRefraction();
 	void SetFogRimToon();
 	void SetExplosion();
-	//void SetVisNormShader();
+	void SetVisNormShader();
 	//void SetDissolveShader();
 
 	float explosionFactor;

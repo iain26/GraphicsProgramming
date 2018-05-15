@@ -54,7 +54,7 @@ void TheGame::Initialise()
 	//OldShader.InitialiseShader("..\\res\\Shaders\\shader");
 	//DissShader.InitialiseShader("..\\res\\Shaders\\DissolveShader");
 	Skybox.InitialiseShader("..\\res\\Shaders\\Cubemap");
-	//VisNormShader.LoadThreeShaders("..\\res\\Shaders\\VisNormShader");
+	VisNormShader.LoadThreeShaders("..\\res\\Shaders\\VisNormShader");
 	reflectionShader.InitialiseShader("..\\res\\Shaders\\reflection");
 	refractionShader.InitialiseShader("..\\res\\Shaders\\refraction");
 	PlaneShader.InitialiseShader("..\\res\\Shaders\\shaderRimToon");
@@ -66,7 +66,7 @@ void TheGame::Initialise()
 	planeTexture.LoadTextureFile("..\\res\\Textures\\Metal.jpg");
 	birdTexture.LoadTextureFile("..\\res\\Textures\\fur.jpg");
 
-	OL.LoadTex("..\\res\\Textures\\spiderman.jpg");
+	healthSquare.LoadTex("..\\res\\Textures\\spiderman.jpg");
 
 	cubemapTex = SetSkyboxTex();
 	SetSkyboxVertices();
@@ -345,13 +345,19 @@ void TheGame::Keyboard()
 		}
 
 		if (ks[SDL_SCANCODE_SPACE]) {
-			// esc pressed then quit the game loop
 			invisiblePressed = true;
 			invisibleTimer = invisibleTimer - 0.01f;
 		}
 		else {
 			invisiblePressed = false;
 			invisibleTimer = 4;
+		}
+
+		if(ks[SDL_SCANCODE_LSHIFT]) {
+			visibleNormals = true;
+		}
+		else {
+			visibleNormals = false;
 		}
 
 		if (ks[SDL_SCANCODE_ESCAPE]) {
@@ -405,12 +411,12 @@ void TheGame::SetRimToonLighting() {
 //	DissShader.SetTexture()
 //}
 
-//void TheGame::SetVisNormShader() {
-//	VisNormShader.Bind();
-//	VisNormShader.setMat4("m", planeMovements.GetModel());
-//	VisNormShader.setMat4("v", cam.GetView());
-//	VisNormShader.setMat4("p", cam.GetProjection());
-//}
+void TheGame::SetVisNormShader() {
+	VisNormShader.Bind();
+	VisNormShader.setMat4("model", bird3Movements.GetModel());
+	VisNormShader.setMat4("view", cam.GetView());
+	VisNormShader.setMat4("projection", cam.GetProjection());
+}
 
 unsigned int TheGame::SetSkyboxTex() {
 
@@ -604,14 +610,54 @@ void TheGame::DrawBirds() {
 	SetExplosion();
 	explodingShader.UpdateShader(bird2Movements, cam);
 	bird2.RenderModel();
-	SetReflection();
-	reflectionShader.UpdateShader(bird3Movements, cam);
+	if (!visibleNormals) {
+		SetReflection();
+		reflectionShader.UpdateShader(bird3Movements, cam); 
+	}
+	else {
+		SetVisNormShader();
+		VisNormShader.UpdateShader(bird3Movements, cam);
+	}
 	bird3.RenderModel();
 }
 
 void TheGame::DrawOverlay() {
 	OverlayShader.Bind();
-	OL.Draw(displayWindow.GetWidth(), displayWindow.GetHeight());
+	switch (HitsTaken) {
+	case 0:
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -1);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.85);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.7);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.55);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.4);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.25);
+		break;
+	case 1:
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -1);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.85);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.7);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.55);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.4);
+		break;
+	case 2:
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -1);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.85);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.7);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.55);
+		break;
+	case 3:
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -1);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.85);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.7);
+		break;
+	case 4:
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -1);
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -0.85);
+		break;
+	case 5:
+		healthSquare.Draw(displayWindow.GetWidth(), displayWindow.GetHeight(), -1);
+		break;
+	}
 }
 
 void TheGame::Render()

@@ -81,4 +81,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\res\Shaders\VisNormShader.geo">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Shaders\VisNormShader.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Shaders\Cubemap.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Shaders\VisNormShader.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\res\Shaders\shaderFogRimToon.geo">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

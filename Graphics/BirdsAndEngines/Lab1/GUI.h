@@ -8,9 +8,9 @@ public:
 	GUI();
 	~GUI();
 
-	void Draw(float w, float h);
+	void Draw(float w, float h, float offset);
 	void LoadTex(const std::string& file);
-	void DrawQuad();
+	void DrawQuad(float offset);
 
 	Tex Overlay;
 };

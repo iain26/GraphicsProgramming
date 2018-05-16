@@ -36,10 +36,10 @@ void GUI::DrawQuad(float offset) {
 	glBindTexture(GL_TEXTURE_2D, Overlay.GetTexHandler());
 
 	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 1.0f); glVertex2f(0.05f + offset, -0.95f);
-	glTexCoord2f(1.0f, 1.0f); glVertex2f(0.15f + offset, -0.95f);
-	glTexCoord2f(1.0f, 0.0f); glVertex2f(0.15f + offset, -0.85f);
-	glTexCoord2f(0.0f, 0.0f); glVertex2f(0.05f + offset, -0.85f);
+	glTexCoord2f(0.0f, 0.0f); glVertex2f(0.05f + offset, -0.95f);
+	glTexCoord2f(0.0f, 1.0f); glVertex2f(0.15f + offset, -0.95f);
+	glTexCoord2f(1.0f, 1.0f); glVertex2f(0.15f + offset, -0.85f);
+	glTexCoord2f(1.0f, 0.0f); glVertex2f(0.05f + offset, -0.85f);
 	glEnd();
 
 	glDisable(GL_TEXTURE_2D);

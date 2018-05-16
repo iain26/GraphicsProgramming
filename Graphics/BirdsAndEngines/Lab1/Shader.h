@@ -80,12 +80,12 @@ public:
 	void setVec3(const std::string &name, const glm::vec3 &value) const
 	{
 		glUniform3fv(glGetUniformLocation(ShaderProgram, name.c_str()), 1, &value[0]);
-
-	/*	if ((glGetUniformLocation(ShaderProgram, name.c_str()) == -1))
+		if ((glGetUniformLocation(ShaderProgram, name.c_str()) == -1))
 		{
 			std::cerr << "Unable to load shader: " << name.c_str() << std::endl;
 			__debugbreak();
-		}*/
+		}
+
 	}
 	void setVec3(const std::string &name, float x, float y, float z) const
 	{

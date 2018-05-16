@@ -20,9 +20,9 @@ void Shader::InitialiseShader(const std::string& filename)
 		glAttachShader(ShaderProgram, shaders[i]);
 	}
 	// link positons, normals and texture coordinates assigned to shader program
-	glBindAttribLocation(ShaderProgram, 0, "position");
-	glBindAttribLocation(ShaderProgram, 1, "normal");
-	glBindAttribLocation(ShaderProgram, 2, "texCoord");
+	//glBindAttribLocation(ShaderProgram, 0, "position");
+	//glBindAttribLocation(ShaderProgram, 1, "normal");
+	//glBindAttribLocation(ShaderProgram, 2, "texCoord");
 	// create executable and return if the link to shader program was successful
 	glLinkProgram(ShaderProgram);
 	ShaderErrorHandling(ShaderProgram, GL_LINK_STATUS, true, "Error: Shader program linking failed");
@@ -45,16 +45,16 @@ void Shader::LoadThreeShaders(const std::string& filename) {
 		glAttachShader(ShaderProgram, shaders[i]);
 	}
 	// link positons, normals and texture coordinates assigned to shader program
-	glBindAttribLocation(ShaderProgram, 0, "position");
-	glBindAttribLocation(ShaderProgram, 1, "normal");
-	glBindAttribLocation(ShaderProgram, 2, "texCoord");
+	//glBindAttribLocation(ShaderProgram, 0, "position");
+	//glBindAttribLocation(ShaderProgram, 1, "normal");
+	//glBindAttribLocation(ShaderProgram, 2, "texCoord");
 	// create executable and return if the link to shader program was successful
 	glLinkProgram(ShaderProgram);
 	ShaderErrorHandling(ShaderProgram, GL_LINK_STATUS, true, "Error: Shader program linking failed");
 	// validates whether executables are contained in shader program
 	glValidateProgram(ShaderProgram);
 	ShaderErrorHandling(ShaderProgram, GL_VALIDATE_STATUS, true, "Error: Shader program not valid");
-	// get transform uniform from shader program
+	// Get transform uniform memory location from the shader (allows us to set transform later on)
 	uniforms[TransformUnif] = glGetUniformLocation(ShaderProgram, "transform");
 }
 

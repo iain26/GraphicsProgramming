@@ -137,8 +137,8 @@ private:
 	void SetSkyboxVertices();
 	void DrawSkyBox();
 
-	GLuint reflVAO, reflVBO;
-	void SetReflectionVertices();
+	GLuint envVAO, envVBO;
+	void SetEnvironmentVertices();
 
 	float skyboxVertices[108] = {
 		// positions          

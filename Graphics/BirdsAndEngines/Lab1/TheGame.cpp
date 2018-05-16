@@ -71,7 +71,7 @@ void TheGame::Initialise()
 	cubemapTex = SetSkyboxTex();
 	SetSkyboxVertices();
 
-	SetReflectionVertices();
+	SetEnvironmentVertices();
 }
 
 void TheGame::PlaySoundFiles(unsigned int soundFile, glm::vec3 origin)
@@ -419,7 +419,7 @@ void TheGame::SetVisNormShader() {
 }
 
 unsigned int TheGame::SetSkyboxTex() {
-
+	
 	unsigned int ID;
 	glGenTextures(1, &ID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
@@ -430,6 +430,7 @@ unsigned int TheGame::SetSkyboxTex() {
 	{
 		unsigned char *data = stbi_load(skyTexture.GetFileName().c_str(), &width, &height, &nrChannels, 0);
 		if (data) {
+			//sets texture on all faces of cube 
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 			stbi_image_free(data);
 		}
@@ -460,12 +461,12 @@ void TheGame::SetSkyboxVertices() {
 
 }
 
-void TheGame::SetReflectionVertices() {
+void TheGame::SetEnvironmentVertices() {
 
-	glGenVertexArrays(1, &reflVAO);
-	glGenBuffers(1, &reflVBO);
-	glBindVertexArray(reflVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, reflVBO);
+	glGenVertexArrays(1, &envVAO);
+	glGenBuffers(1, &envVBO);
+	glBindVertexArray(envVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, envVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
@@ -477,7 +478,7 @@ void TheGame::SetReflection() {
 	reflectionShader.setMat4("m", bird3Movements.GetModel());
 	reflectionShader.setVec3("camPos", cam.GetPos());
 
-	glBindVertexArray(reflVAO);
+	glBindVertexArray(envVAO);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTex);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
@@ -488,7 +489,7 @@ void TheGame::SetRefraction() {
 	refractionShader.setMat4("m", planeMovements.GetModel());
 	refractionShader.setVec3("camPos", cam.GetPos());
 
-	glBindVertexArray(reflVAO);
+	glBindVertexArray(envVAO);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTex);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
@@ -588,7 +589,7 @@ void TheGame::DrawSkyBox() {
 void TheGame::DrawPlane() {
 	if (invisiblePressed && invisibleTimer > 0) {
 		invisible = true;
-		reflectionShader.Bind();
+		refractionShader.Bind();
 		SetRefraction();
 		refractionShader.UpdateShader(planeMovements, cam);
 	}
